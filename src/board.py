@@ -1,4 +1,5 @@
 class Board:
+
     def __init__(self, width: int, height: int) -> None:
         self.width = width
         self.height = height
@@ -18,6 +19,10 @@ class Board:
             self.cells.append([])
             for j in range (self.width) :
                 self.cells[i].append(Cell(j, i, False, self))
+
+    def set_seed(self, seed: list) -> None:
+        for pos in seed:
+            self.cells[pos[0]][pos[1]] = Cell(pos[0], pos[1], True, self)
 
 class Cell:
 
@@ -46,3 +51,19 @@ class Cell:
                if 0 <= nx < self.board.width and 0 <= ny < self.board.height:
                     neighbor = self.board.cells[ny][nx]
                     self.neighbors.append(neighbor)
+
+    def set_next(self) -> bool:
+        nb_alive = 0
+
+        for neighbor in self.neighbors:
+            if neighbor.alive == True:
+                nb_alive+=1
+
+        if self.alive == True and 2 > nb_alive < 3:
+            self.alive = False
+            return False
+        elif self.alive == False and nb_alive == 3:
+            self.alive = True
+            return True
+
+        return self.alive
