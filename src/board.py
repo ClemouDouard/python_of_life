@@ -6,34 +6,27 @@ class Board:
 
     def __str__(self) -> str:
         res = ""
-        for x in range (self.height):
+        for y in range (self.height):
             res += "| "
-            for y in range (self.width):
-                res += f"{self.cells[x][y]} | "
+            for x in range (self.width):
+                res += f"{self.cells[y][x]} | "
             res += "\n"
         return res
 
     def fill_cells(self) -> None:
-        self.cells = []
-        for i in range (self.height) :
-            self.cells.append([])
-            for j in range (self.width) :
-                self.cells[i].append(Cell(j, i, False, self))
+        self.cells = [[Cell(x, y, False, self) for x in range(self.width)] for y in range(self.height)]
+        for row in self.cells:
+            for cell in row:
+                cell.calc_neighbors()  # Pré-calcule les voisins
 
     def set_seed(self, seed: list) -> None:
         for pos in seed:
-            self.cells[pos[0]][pos[1]] = Cell(pos[0], pos[1], True, self)
+            self.cells[pos[0]][pos[1]].alive = True
 
     def next_board(self) -> None:
-        next_cells = []
         for row in self.cells:
-            next_row = []
             for cell in row:
-                cell.calc_neighbors()
-                cell.set_next()
-                next_row.append(cell)
-            next_cells.append(next_row)
-        self.cells = next_cells
+                cell.alive = cell.set_next()
 
 
 class Cell:
@@ -61,10 +54,10 @@ class Cell:
 
                # verify if in limit
                if 0 <= nx < self.board.width and 0 <= ny < self.board.height:
-                    neighbor = self.board.cells[nx][ny]
+                    neighbor = self.board.cells[ny][nx]
                     self.neighbors.append(neighbor)
 
-    def set_next(self) -> None:
+    def set_next(self) -> bool:
         nb_alive = 0
 
         for neighbor in self.neighbors:
@@ -72,6 +65,7 @@ class Cell:
                 nb_alive+=1
 
         if self.alive and (nb_alive < 2 or nb_alive > 3):
-            self.alive = False
+            return False
         elif not self.alive and nb_alive == 3:
-            self.alive = True
+            return True
+        return self.alive
