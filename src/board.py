@@ -25,14 +25,15 @@ class Board:
             self.cells[pos[0]][pos[1]] = Cell(pos[0], pos[1], True, self)
 
     def next_board(self) -> None:
-        next_board = Board(self.width, self.height)
-        next_board.fill_cells()
+        next_cells = []
         for row in self.cells:
+            next_row = []
             for cell in row:
                 cell.calc_neighbors()
                 cell.set_next()
-                next_board.cells[cell.x][cell.y] = cell
-        self = next_board
+                next_row.append(cell)
+            next_cells.append(next_row)
+        self.cells = next_cells
 
 
 class Cell:
@@ -70,7 +71,7 @@ class Cell:
             if neighbor.alive == True:
                 nb_alive+=1
 
-        if self.alive == True and 2 > nb_alive < 3:
+        if self.alive and (nb_alive < 2 or nb_alive > 3):
             self.alive = False
-        elif self.alive == False and nb_alive == 3:
+        elif not self.alive and nb_alive == 3:
             self.alive = True
