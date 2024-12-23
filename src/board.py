@@ -24,6 +24,17 @@ class Board:
         for pos in seed:
             self.cells[pos[0]][pos[1]] = Cell(pos[0], pos[1], True, self)
 
+    def next_board(self) -> None:
+        next_board = Board(self.width, self.height)
+        next_board.fill_cells()
+        for row in self.cells:
+            for cell in row:
+                cell.calc_neighbors()
+                cell.set_next()
+                next_board.cells[cell.x][cell.y] = cell
+        self = next_board
+
+
 class Cell:
 
     def __init__(self, x: int, y: int, alive: bool, b: Board) -> None:
@@ -49,10 +60,10 @@ class Cell:
 
                # verify if in limit
                if 0 <= nx < self.board.width and 0 <= ny < self.board.height:
-                    neighbor = self.board.cells[ny][nx]
+                    neighbor = self.board.cells[nx][ny]
                     self.neighbors.append(neighbor)
 
-    def set_next(self) -> bool:
+    def set_next(self) -> None:
         nb_alive = 0
 
         for neighbor in self.neighbors:
@@ -61,9 +72,5 @@ class Cell:
 
         if self.alive == True and 2 > nb_alive < 3:
             self.alive = False
-            return False
         elif self.alive == False and nb_alive == 3:
             self.alive = True
-            return True
-
-        return self.alive
