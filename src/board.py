@@ -24,9 +24,10 @@ class Board:
             self.cells[pos[0]][pos[1]].alive = True
 
     def next_board(self) -> None:
-        for row in self.cells:
-            for cell in row:
-                cell.alive = cell.set_next()
+        next_states = [[cell.set_next() for cell in row] for row in self.cells]
+        for y in range (self.height):
+            for x in range (self.width):
+                self.cells[y][x].alive = next_states[y][x]
 
 
 class Cell:
